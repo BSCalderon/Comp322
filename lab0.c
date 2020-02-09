@@ -8,6 +8,10 @@
 int main(int argc, char *argv[])
 {
         int fp;
+	const char *values[] = {"NUL","SOH","STX","ETX","EOT","ENQ","ACK","BEL",
+				"BS","HT","LF","VT","FF","CR","SO","SI","DLE","DC1",
+				"DC2","DC3","DC4","NAK","SYN","ETB","CAN","EM","SUB",
+				"ESC","FS","GS","RS","US","SPACE"};
         if(argc <= 1)
         {
                 printf("Error: No Input\n");
@@ -20,6 +24,8 @@ int main(int argc, char *argv[])
                 if(cmp == 0) x = 2;
                 char str[9];
                 char str2[8];
+		printf("Original ASCII    Decimal  Parity  \n");
+		printf("-------- -------- -------- --------\n");
                 for(int y = x; y < argc; y++)
                 {
                         strcpy(str,argv[y]);
@@ -42,15 +48,28 @@ int main(int argc, char *argv[])
                         char *ptr;
                         char c = strtol(str2,&ptr,2);
                         int a = (int)c;
+			
+			if(a > 32 && a != 127)
+			{
+				printf("%s%9c%9i",str,c,a);
+			}
+			else if(a == 127)
+			{
+				printf("%s%9s%9i",str,"DEL",a);
+			}
+			else
+			{
+				printf("%s%9s%9i",str, values[a],a);
+			}
 
-                        printf("%s\t%c\t%i\t",str,c,a);
+                        //printf("%s\t%c\t%i",str,c,a);
                         if(sum % 2 == 0)
                         {
-                                printf("EVEN\n");
+                                printf("%5s\n","EVEN");
                         }
                         else
                         {
-                                printf("ODD\n");
+                                printf("%4s\n","ODD");
                         }
                 }
         }
