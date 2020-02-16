@@ -109,7 +109,18 @@ int main(int argc, char *argv[])
                                 char *ptr;
                                 char ch = strtol(str2,&ptr,2);
                                 int i = (int)ch;
-                                printf("%s\t%c\t%i\t",str,ch,i);
+                                if(i > 32 && i != 127)
+                                {
+                                printf("%s%9c%9i",str,c,i);
+                                }
+                                else if(i == 127)
+                                {
+                                        printf("%s%9s%9i",str,"DEL",i);
+                                }
+                                else
+                                {
+                                        printf("%s%9s%9i",str, values[i],i);
+                                }
                                 if(sum % 2 == 0) printf("EVEN\n");
                                 else printf("ODD\n");
                                 x = 0;
