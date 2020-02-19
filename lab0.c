@@ -5,123 +5,228 @@
 #include<string.h>
 #include<stdlib.h>
 #include<unistd.h>
-int main(int argc, char *argv[])
-{
-        int fp;
-	const char *values[] = {"NUL","SOH","STX","ETX","EOT","ENQ","ACK","BEL",
+
+void header();
+void padRight(char *array, char *string);
+void padRight2(char *string);
+void printArray(char *ar);
+int sum(char *array);
+void copy7(char *dest, char *src);
+void print(char *array, int decimal, char ascii);
+int inputCheck(char *array);
+
+const char *values[] = {"NUL","SOH","STX","ETX","EOT","ENQ","ACK","BEL",
 				"BS","HT","LF","VT","FF","CR","SO","SI","DLE","DC1",
 				"DC2","DC3","DC4","NAK","SYN","ETB","CAN","EM","SUB",
 				"ESC","FS","GS","RS","US","SPACE"};
-        if(argc <= 1)
-        {
-                printf("Error: No Input\n");
-                exit(0);
-        }
-        else if((open(argv[1], O_RDONLY)) == -1)
-        {
-                int cmp = strcmp(argv[1], "-");
-                int x = 1;
-                if(cmp == 0) x = 2;
-                char str[9];
-                char str2[8];
-		printf("Original ASCII    Decimal  Parity  \n");
-		printf("-------- -------- -------- --------\n");
-                for(int y = x; y < argc; y++)
-                {
-                        strcpy(str,argv[y]);
-                        int sum = 0;
-                        unsigned len = (unsigned)strlen(argv[y]);
-                        if(len < 9)
-                        {
-                                for(int z = len; z < 9; z++)
-                                {
-                                        str[z] = '0';
-                                }
-                                str[8] = '\0';
-                        }
-                        for(int e = 0; e < 8; e++)
-                        {
-                                str2[e] = str[e+1];
-                                sum += (int)str[e];
-                        }
-                        //char c = strtol(str2,0,2);
-                        char *ptr;
-                        char c = strtol(str2,&ptr,2);
-                        int a = (int)c;
+
+int main(int argc, char *argv[])
+{
+	char string[9];
+	char string8[8];
+	
+	//conditional to check if number of arguments is valid
+	if(argc <= 1)
+	{
+		printf("Error: No Input\n");
+		exit(0);
+	}
+	//conditional to check if file exists
+	else if(access(argv[1],F_OK) != -1)
+	{
+		//check file for any possible errors
+		int file = open(argv[1], O_RDONLY);
+		if(file >= 0)
+		{
+			char buffer[250];
+			char ch;
+			int count = -1;
+			int index = 0;
+			int ind = 0;
+			char *rest;
 			
-			if(a > 32 && a != 127)
+			while(read(file,&ch,1) != 0)
 			{
-				printf("%s%9c%9i",str,c,a);
+				buffer[index++] = ch;
+				++count;
 			}
-			else if(a == 127)
+			buffer[count] = '\0';
+
+			header();
+			for(int x = x; x <= count; x++)
 			{
-				printf("%s%9s%9i",str,"DEL",a);
+				if(buffer[x] != ' ')
+				{
+					string[ind++] = buffer[x];
+				}
+				if(buffer[x] == ' ' || buffer[x] == '\0')
+				{
+					padRight2(string);
+					copy7(string8,string);
+					char ascii = strtol(string8,&rest,2);
+					int dec = (int)ascii;
+					print(string,dec,ascii);
+
+					ind = 0;
+				}
 			}
-			else
+			
+		}
+		else
+		{
+			printf("error reading file\n");
+		}
+		
+	}
+	//conditional to check if 2nd is "-" or numbers
+	else if(strcmp(argv[1],"-") == 0 || argv[1][0] == '0' || argv[1][0] == '1')
+	{
+		int index = 1;
+		int flag = 0;
+		char *rest;
+		if(strcmp(argv[1],"-") == 0) { index = 2;}
+		
+		
+		//loops through argv to make sure input is valid and sets flag to true
+		for(int x = index; x < argc; x++)
+		{
+			flag = inputCheck(argv[x]);
+			
+		}
+		//if the flag is true, enter calculations and printing
+		if(flag == 1)
+		{
+			header();
+			for(int x = index; x < argc; x++)
 			{
-				printf("%s%9s%9i",str, values[a],a);
+				padRight(argv[x],string);
+			
+				copy7(string8,string);
+
+				char ascii = strtol(string8,&rest,2);
+				int dec = (int)ascii;
+				print(string,dec,ascii);
+			
 			}
+		}
+		else
+		{
+			printf("Invalid input\n");
+		}
+	}
+	else
+	{
+		printf("file does not exist or input is invalid\n");
+	}
+	return 0;
+}
+//functions
 
-                        //printf("%s\t%c\t%i",str,c,a);
-                        if(sum % 2 == 0)
-                        {
-                                printf("%5s\n","EVEN");
-                        }
-                        else
-                        {
-                                printf("%4s\n","ODD");
-                        }
-                }
-        }
-        else if((fp = open(argv[1], O_RDONLY)) != 1)
-        {
-                (void)argc;
-                char c;
-                char str[9];
-                char str2[8];
-                int x = 0;
+//prints out the header
+void header()
+{
+	printf("Original ASCII    Decimal  Parity  \n");
+	printf("-------- -------- -------- --------\n");
+}
+//organized printing of information
+void print(char *array, int decimal, char ascii)
+{
+	if(decimal > 32 && decimal != 127)
+	{
+		printf("%s%9c%9i",array,ascii,decimal);
+	}
+	else if(decimal == 127)
+	{
+		printf("%s%9s%9i",array,"DEL",decimal);
+	}
+	else
+	{
+		printf("%s%9s%9i",array, values[decimal],decimal);
+	}
 
-                while((read(fp, &c, 1)) != 0)
-                {
-                        if(c != ' ')
-                        {
-                                str[x] = c;
-                                x++;
-                        }
-                        if(c == ' ')
-                        {
-                                //strcpy(str,argv[x]);
-                                int sum = 0;
-                                unsigned len = (unsigned)strlen(str);
-                                if(len < 9)
-                                {
-                                        for(int y = len; y < 9; y++)
-                                        {
-                                                str[y] = '0';
-                                        }
-                                        str[8] = '\0';
-                                }
-                                for(int a = 0; a < 8; a++)
-                                {
-                                        str2[a] = str[a+1];
-                                        sum+= (int)str[a];
-                                }
-                                char *ptr;
-                                char ch = strtol(str2,&ptr,2);
-                                int i = (int)ch;
-                                printf("%s\t%c\t%i\t",str,ch,i);
-                                if(sum % 2 == 0) printf("EVEN\n");
-                                else printf("ODD\n");
-                                x = 0;
-                        }
+	if(sum(array) % 2 == 0)
+	{
+		printf("%5s\n","EVEN");
+	}
+	else
+	{
+		printf("%4s\n","ODD");
+	}
+}
+//pads an array with zeros
+void padRight(char *array, char *string)
+{
+	unsigned len = (unsigned)strlen(array);
+	strcpy(string,array);
+	if(len < 9)
+	{
+		for(int x = len; x < 8; x++)
+		{
+			string[x] = '0';
+		}
+		string[8] = '\0';
+	}
+}
 
-                        //printf("%i",x);
-                }
-                //printf("%i",x);
-        }
-        else
-        {
-                printf("file did not open\n");
-                exit(0);
-        }
+//pads an array with zeros, but with one parameter
+void padRight2(char *string)
+{
+	unsigned len = (unsigned)strlen(string);
+	
+	if(len < 9)
+	{
+		for(int x = len; x < 8; x++)
+		{
+			string[x] = '0';
+		}
+		string[8] = '\0';
+	}
+}
+
+//returns the sum of the arrays elements
+int sum(char *array)
+{
+	int summ = 0;
+	for(int x = 0; x < 8; x++)
+	{
+		summ += array[x] - '0';
+	}
+	return summ;
+}
+
+//copy 9 element array into 8 for conversion
+void copy7(char *dest, char *src)
+{
+	for(int x = 0; x < 8; x++)
+	{
+		dest[x] = src[x+1];
+	}
+}
+
+//prints array
+void printArray(char *ar)
+{
+	
+	for(int x = 0; x < 7; x++)
+	{
+		printf("%c",ar[x]);
+	}
+	printf("\n");
+	
+}
+
+//checks through each argv and returns 0 if input is invalid
+int inputCheck(char *array)
+{
+	unsigned length = (unsigned)strlen(array);
+	int flag = 1;
+	for(unsigned x = 0; x < length; x++)
+	{
+		if(array[x] != '0' && array[x] != '1')
+		{
+			flag = 0;
+			return flag;
+		}
+	}
+	return flag;
 }
