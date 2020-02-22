@@ -168,7 +168,7 @@ void padRight(char *array, char *string)
 	}
 }
 
-<<<<<<< HEAD
+
 //pads an array with zeros, but with one parameter
 void padRight2(char *string)
 {
@@ -183,52 +183,7 @@ void padRight2(char *string)
 		string[8] = '\0';
 	}
 }
-=======
-                while((read(fp, &c, 1)) != 0)
-                {
-                        if(c != ' ')
-                        {
-                                str[x] = c;
-                                x++;
-                        }
-                        if(c == ' ')
-                        {
-                                //strcpy(str,argv[x]);
-                                int sum = 0;
-                                unsigned len = (unsigned)strlen(str);
-                                if(len < 9)
-                                {
-                                        for(int y = len; y < 9; y++)
-                                        {
-                                                str[y] = '0';
-                                        }
-                                        str[8] = '\0';
-                                }
-                                for(int a = 0; a < 8; a++)
-                                {
-                                        str2[a] = str[a+1];
-                                        sum+= (int)str[a];
-                                }
-                                char *ptr;
-                                char ch = strtol(str2,&ptr,2);
-                                int i = (int)ch;
-                                if(i > 32 && i != 127)
-                                {
-                                printf("%s%9c%9i",str,c,i);
-                                }
-                                else if(i == 127)
-                                {
-                                        printf("%s%9s%9i",str,"DEL",i);
-                                }
-                                else
-                                {
-                                        printf("%s%9s%9i",str, values[i],i);
-                                }
-                                if(sum % 2 == 0) printf("EVEN\n");
-                                else printf("ODD\n");
-                                x = 0;
-                        }
->>>>>>> 3a394262d5975ba1561289a213272ab1be26b5b2
+
 
 //returns the sum of the arrays elements
 int sum(char *array)
