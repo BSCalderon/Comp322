@@ -5,6 +5,7 @@
 #include<unistd.h>
 #include<stdio.h>
 #include<stdlib.h>
+void printTimes(struct tms Times);
 int main()
 {
 	time_t _time;
@@ -13,6 +14,7 @@ int main()
 	struct tms cuTimes;
 	_time = time(NULL);
 	printf("START: %ld\n",_time);
+	//Create child process.
 	pid = fork();
 
 	//If pid return a negative number, failure.
@@ -36,22 +38,27 @@ int main()
 		
 		int status;
 		w = waitpid(pid,&status,0);
-		_time = time(NULL);
-		times(&cuTimes);
-		printf("PPID: %u, PID: %u, CPID: %u, RET: %d\n",getppid(),getpid(),pid,status);
-		printf("USER: %jd, ",cuTimes.tms_utime);
-		printf("SYS: %jd\n",cuTimes.tms_stime);
-		printf("CUSER: %jd, ",cuTimes.tms_cutime);
-		printf("CSYS: %jd\n",(cuTimes.tms_cstime));
-		printf("END: %jd\n",_time);
 		if(w == -1)
 		{
 			printf("waitpid error\n");
 			exit(EXIT_FAILURE);
 		}
-
+		_time = time(NULL);
+		times(&cuTimes);
+		printf("PPID: %u, PID: %u, CPID: %u, RET: %d\n",getppid(),getpid(),pid,status);
+		printTimes(cuTimes);
+		printf("END: %jd\n",_time);
 	}
 
 	exit(EXIT_SUCCESS);
 	
+}
+
+
+void printTimes(struct tms Times)
+{
+	printf("USER: %jd, ",Times.tms_utime);
+	printf("SYS: %jd\n",Times.tms_stime);
+	printf("CUSER: %jd, ",Times.tms_cutime);
+	printf("CSYS: %jd\n",Times.tms_cstime);
 }
