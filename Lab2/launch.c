@@ -44,5 +44,5 @@ int main(int argc, char *argv[])
 		waitpid(pid, &status, 0);
 		fprintf(stderr, "%s: $? = %d\n",argv[1], status);
 	}
-	exit(EXIT_FAILURE);
+	exit(EXIT_SUCCESS);
 }
