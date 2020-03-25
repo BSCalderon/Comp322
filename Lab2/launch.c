@@ -42,7 +42,7 @@ int main(int argc, char *argv[])
 		int status;
 		fprintf(stderr, "%s: $$ = %u\n",argv[1], pid);
 		waitpid(pid, &status, 0);
-		fprintf(stderr, "\n%s: $? = %d\n",argv[1], status);
+		fprintf(stderr, "%s: $? = %d\n",argv[1], status);
 	}
 	exit(EXIT_SUCCESS);
 }
