@@ -6,10 +6,56 @@
 #include<time.h>
 
 const int NUM = 29;
-const char *signals[] = {"NULL", "SIGHUP", "SIGINT", "SIGQUIT", "SIGILL", "SIGTRAP", "SIGABRT", "SIGBUS", "SIGFPE", "NULL", "SIGUSR1", "SIGSEGV", "SIGUSR2", "SIGPIPE", "SIGALRM",
-                        "SIGTERM", "SIGSTKFLT", "SIGCHLD", "SIGCONT", "NULL", "NULL", "SIGTTIN", "SIGTTOU", "SIGURG", "SIGXCPU", "SIGXFSZ", "SIGVTALRM", "SIGPROF", "SIGWINCH"};
+const char *signals[] = {"NULL", "HUP", "INT", "QUIT", "ILL", "TRAP", "ABRT", "BUS", "FPE", "NULL", "USR1", "SEGV", "USR2", "PIPE", "ALRM",
+                        "TERM", "STKFLT", "CHLD", "CONT", "NULL", "NULL", "TTIN", "TTOU", "URG", "XCPU", "XFSZ", "VTALRM", "PROF", "WINCH"};
 
 int sigCount = 0;
+
+void handler(int number);
+int locateSig(char *sig);
+
+int main(int argc, char *argv[])
+{
+    if(argc < 2)
+    {
+        fprintf(stderr, "Too few arguments.\n");
+        exit(EXIT_FAILURE);
+    }
+	
+    for(int x = 1; x < argc; x++)
+    {
+		int s = locateSig(argv[x]);
+		if(s == -1) 
+		{
+			fprintf(stderr,"Error in locating signal\n");
+    		exit(EXIT_FAILURE);
+		}
+		signal(s,handler);
+    }
+
+    fprintf(stderr, "%s: $$ = %d\n", argv[0], getpid());
+      
+    while(sigCount != 3)
+    {
+        pause();
+       
+    }
+    exit(EXIT_SUCCESS);
+}
+//function to locate signal integer from argv string
+int locateSig(char *sig)
+{
+    for(int x = 0; x < NUM; x++)
+    {
+        if(strcasecmp(signals[x],sig) == 0)
+        {
+            return x;
+        }
+    }
+	//if can't locate proper signal.
+    return -1;
+}
+//handler function
 void handler(int number)
 {
     static int total = 0;
@@ -33,54 +79,8 @@ void handler(int number)
     else
     {
         
-        printf("%s caught at %ld\n", signals[number], seconds);
+        printf("SIG%s caught at %ld\n", signals[number], seconds);
         
     }
     
-   
-
-}
-
-int locateSig(char *sig)
-{
-    for(int x = 0; x < NUM; x++)
-    {
-        if(strcasecmp(signals[x],sig) == 0)
-        {
-            return x;
-        }
-    }
-    printf("Error in locating signal\n");
-    exit(EXIT_FAILURE);
-}
-int main(int argc, char *argv[])
-{
-    if(argc < 2)
-    {
-        fprintf(stderr, "Too few arguments.\n");
-        exit(EXIT_FAILURE);
-    }
-
-    fprintf(stderr, "%s: $$ = %d\n", argv[0], getpid());
-    char sig1[10];
-    char sig2[10];
-    char sig3[10];
-    
-    strcpy(sig1, "SIG");
-    strcpy(sig2, "SIG");
-    strcpy(sig3, "SIG");
-
-    strcat(sig1,argv[1]);
-    strcat(sig2,argv[2]);
-    strcat(sig3,argv[3]);
-
-    signal(locateSig(sig1),handler);
-    signal(locateSig(sig2),handler);
-    signal(locateSig(sig3),handler);
-    while(sigCount != 3)
-    {
-        pause();
-       
-    }
-    exit(EXIT_SUCCESS);
 }
