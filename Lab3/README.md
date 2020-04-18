@@ -1,6 +1,6 @@
 # Catcher
 
-![alt text](https://tenor.com/zYXO.gif "attempting to catch")
+![alt text](https://gfycat.com/honestgreedycolt "attempting to catch")
 
 In this lab project, we developed a program that catches signals. When a signal is caught, information will be outputted to stdout.
 

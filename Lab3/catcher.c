@@ -45,10 +45,15 @@ int main(int argc, char *argv[])
 //function to locate signal integer from argv string
 int locateSig(char *sig)
 {
+    if(strcasecmp(sig,"IOT") == 0)
+    {
+        return 6;
+    }
     for(int x = 0; x < NUM; x++)
     {
         if(strcasecmp(signals[x],sig) == 0)
         {
+            
             return x;
         }
     }
