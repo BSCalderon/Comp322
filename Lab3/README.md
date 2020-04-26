@@ -1,8 +1,7 @@
 # Catcher
 
 
-![alt text](https://gfycat.com/honestgreedycolt "attempting to catch")
-=======
+
 ![alt text](https://pm1.narvii.com/6281/c2ae788f740eb01e841718f160dee95c35957b12_00.jpg "attempting to catch")
 
 
