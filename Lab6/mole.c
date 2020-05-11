@@ -1,19 +1,23 @@
 #include<stdlib.h>
 #include<stdio.h>
-
+#include<string.h>
 int main(int argc, char *argv[])
 {
     FILE *file;
-    file = fopen("~/lab6.log", "w") ;
+    file = fopen("/home/stephen/lab6.log", "a");
+    printf("\n entered mole");
+    if(!file)
+    {
+        perror("Error\n");
+    }
     if(strcmp(argv[1],"1") == 0)
     {
-        fputs("Pop mole1", file);
+        fprintf(file,"Pop mole1\n");
     }
     else
     {
-        fputs("Pop mole2", file);
+        fprintf(file, "Pop mole2\n");
     }
-    fputs(argv[0], file);
     fclose(file);
     return 0;
 }

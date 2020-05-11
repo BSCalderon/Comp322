@@ -1,25 +1,25 @@
-EXECUTABLES1=spiritd moles
+EXECUTABLES1=spiritd mole
 EXECUTABLES2=spiritd
-EXECUTABLES3=moles
-SRC=spiritd.c moles.c
-OBJ=spiritd.o moles.o
+EXECUTABLES3=mole
+SRC=spiritd.c mole.c
+OBJ=spiritd.o mole.o
 SRC1=spiritd.c
 OBJ1=spiritd.o
-SRC2=moles.c
-OBJ2=moles.o
+SRC2=mole.c
+OBJ2=mole.o
 
 
 CC=gcc
 CFLAGS=-g
 
 
-all: spiritd moles 
+all: spiritd mole 
 spiritd: spiritd.c 
 	$(CC) $(CFLAGS) -c spiritd.c
 	$(CC) $(CFLAGS) -o $@ spiritd.o
-moles: moles.c
-	$(CC) $(CFLAGS) -c moles.c
-	$(CC) $(CFLAGS) -o  $@ moles.o
+mole: mole.c
+	$(CC) $(CFLAGS) -c mole.c
+	$(CC) $(CFLAGS) -o  $@ mole.o
 
 
 

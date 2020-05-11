@@ -9,156 +9,108 @@
 #include<sys/time.h>
 #include<sys/resource.h>
 #include<time.h>
+#include<limits.h>
 
-int trigger = 0;
-pid_t pidMoleChild;
-int mole[2] = {0,0};
 
-void handler(int number);
-//static void daemon1();
-int random();
+static pid_t pidMoleChild;
+static int num;
+//char cwd[PATH_MAX];
 
-int main(int argc, char *argv[])
+int randomNum()
 {
-     pid_t pid;
-    struct rlimit rl;
-    int fd0;
-    int fd1;
-    int fd2;
-    char CPN[2];
-    umask(0);
-    if(getrlimit(RLIMIT_NOFILE, &rl) < 0)
+    return (rand() % (2 - 1 + 1) + 1);
+}
+static void handler(int sig)
+{
+    // getcwd(cwd, sizeof(cwd));
+    // strcat(cwd, "/mole");
+    if(sig == SIGTERM)
     {
-        fprintf(stderr,"can't get file limit.\n");
-        exit(EXIT_FAILURE);
-    }
-
-
-    pid = fork();
-
-    if(pid < 0)
-    {
-        fprintf(stderr,"error in fork\n");
-		exit(EXIT_FAILURE);
-    }
-    else if(pid != 0)
-    {
-        //parent
+        kill(pidMoleChild, SIGTERM);
         exit(0);
     }
-    setsid();
-    if(chdir("/") < 0)
+    else if (sig == SIGUSR1)
     {
-        fprintf(stderr,"can't change directory.\n");
+        if(num == 0)
+        {
+            kill(pidMoleChild, SIGCHLD);
+        }
+        num = randomNum();
+        char nums[20];
+        sprintf(nums, "%d", num);
+        char *argv2[] = {"/home/stephen/Comp322/Lab6/mole", nums, NULL};
+        pidMoleChild = fork();
+        if(pidMoleChild == 0)
+        {
+            execve(argv2[0], argv2, NULL);
+        }
+        signal(SIGUSR1, handler);
+    }
+    else if(sig == SIGUSR2)
+    {
+        if(num == 1)
+        {
+            kill(pidMoleChild, SIGCHLD);
+        }
+        num = randomNum();
+        char nums[20];
+        sprintf(nums, "%d", num);
+        char *argv2[] = {"/home/stephen/Comp322/Lab6/mole", nums, NULL};
+        pidMoleChild = fork();
+        if(pidMoleChild == 0)
+        {
+            execve(argv2[0], argv2, NULL);
+        }
+        signal(SIGUSR2, handler);
+    }
+}
+int main(int argc, char *argv[])
+{
+    int fd0;
+    pid_t pid = fork();
+    if(pid < 0)
+    {
+        fprintf(stderr, "Error in forking\n");
         exit(EXIT_FAILURE);
     }
-    if(rl.rlim_max == RLIM_INFINITY)
+    if(pid > 0)
     {
-        rl.rlim_max = 1024;
+        exit(0);
     }
-    for(int x = 0; x < rl.rlim_max; x++)
+
+    umask(0);
+    pid_t sid = setsid();
+    if(sid < 0)
     {
-        close(x);
+        fprintf(stderr, "Error in setsid\n");
+        exit(EXIT_FAILURE);
     }
-    fd0 = open("/dev/null", O_RDWR);
-    fd1 = dup(0);
-    fd2 = dup(0);
+    if(chdir("/") < 0)
+    {
+        exit(EXIT_FAILURE);
+    }
+    
+    if(fd0 = open("/dev/null", O_RDONLY) < 0)
+    {
+        fprintf(stderr, "Error in dev/null opening\n");
+        exit(EXIT_FAILURE);
+    }
+    dup2(fd0, STDIN_FILENO);
+    dup2(fd0, STDOUT_FILENO);
+    dup2(fd0, STDERR_FILENO);
+    close(STDIN_FILENO);
+    close(STDOUT_FILENO);
+    close(STDERR_FILENO);
     signal(SIGTERM, handler);
     signal(SIGUSR1, handler);
     signal(SIGUSR2, handler);
 
     pidMoleChild = fork();
-    
 
     while(1)
     {
+        sleep(1);
         
-        sleep(2);
-        if(pidMoleChild == 0)
-        {
-            itoa(random(), CPN, 10);
-            //execv the mole.c program
-            char *argv2[] = {"mole.c", num, NULL};
-            execv(argv2[0], ++argv2);
-        }
+      
     }
-    
-    
-    return EXIT_SUCCESS;
-}
-// static void daemon1()
-// {
-//     pid_t pid;
-//     struct rlimit rl;
-//     int fd0;
-//     int fd1;
-//     int fd2;
-//     char CPN[2];
-//     umask(0);
-//     if(getrlimit(RLIMIT_NOFILE, &rl) < 0)
-//     {
-//         fprintf(stderr,"can't get file limit.\n");
-//         exit(EXIT_FAILURE);
-//     }
-
-
-//     pid = fork();
-
-//     if(pid < 0)
-//     {
-//         fprintf(stderr,"error in fork\n");
-// 		exit(EXIT_FAILURE);
-//     }
-//     else if(pid != 0)
-//     {
-//         //parent
-//         exit(0);
-//     }
-//     setsid();
-//     if(chdir("/") < 0)
-//     {
-//         fprintf(stderr,"can't change directory.\n");
-//         exit(EXIT_FAILURE);
-//     }
-//     if(rl.rlim_max == RLIM_INFINITY)
-//     {
-//         rl.rlim_max = 1024;
-//     }
-//     for(int x = 0; x < rl.rlim_max; x++)
-//     {
-//         close(x);
-//     }
-//     fd0 = open("/dev/null", O_RDWR);
-//     fd1 = dup(0);
-//     fd2 = dup(0);
-//     signal(SIGTERM, handler);
-//     signal(SIGUSR1, handler);
-//     signal(SIGUSR2, handler);
-
-//     pidMoleChild = fork();
-//     itoa(random(), CPN, 10);
-//     //execv the mole.c program
-//     char *argv2[] = {"mole.c", num, NULL};
-//     execv(argv2[0], ++argv2);
-// }
-
-void handler(int number)
-{
-  if(number == SIGTERM)
-  {
-      kill(pid, SIGTERM);
-      exit(EXIT_SUCCESS);
-  }
-  else if(number == SIGUSR1)
-  {
-      if(pidMoleChild > 0)
-      {
-          kill(pidMoleChild, SIG)
-      }
-  }
-
-}
-int random()
-{
-    return (rand() % (2 - 1 + 1) + 1);
 }
