@@ -14,23 +14,30 @@
 
 static pid_t pidMoleChild;
 static int num;
-//char cwd[PATH_MAX];
-
+char cwd[PATH_MAX];
+char path[300];
 int randomNum()
 {
     return (rand() % (2 - 1 + 1) + 1);
 }
+// const char *getPath()
+// {
+//     static char *f;
+//     strcat(strcpy(f, getenv("HOME")), "/lab6.log");
+//     return f;
+// }
 static void handler(int sig)
 {
-    // getcwd(cwd, sizeof(cwd));
-    // strcat(cwd, "/mole");
+    
+    signal(sig, handler);
     if(sig == SIGTERM)
     {
-        kill(pidMoleChild, SIGTERM);
+        kill(pidMoleChild, SIGKILL);
         exit(0);
     }
     else if (sig == SIGUSR1)
     {
+        
         if(num == 0)
         {
             kill(pidMoleChild, SIGCHLD);
@@ -38,11 +45,12 @@ static void handler(int sig)
         num = randomNum();
         char nums[20];
         sprintf(nums, "%d", num);
-        char *argv2[] = {"/home/stephen/Comp322/Lab6/mole", nums, NULL};
+        
+        char *argv2[] = {path, nums, NULL};
         pidMoleChild = fork();
         if(pidMoleChild == 0)
         {
-            execve(argv2[0], argv2, NULL);
+            execv(argv2[0], argv2);
         }
         signal(SIGUSR1, handler);
     }
@@ -55,11 +63,11 @@ static void handler(int sig)
         num = randomNum();
         char nums[20];
         sprintf(nums, "%d", num);
-        char *argv2[] = {"/home/stephen/Comp322/Lab6/mole", nums, NULL};
+        char *argv2[] = {path, nums, NULL};
         pidMoleChild = fork();
         if(pidMoleChild == 0)
         {
-            execve(argv2[0], argv2, NULL);
+            execv(argv2[0], argv2);
         }
         signal(SIGUSR2, handler);
     }
@@ -67,6 +75,12 @@ static void handler(int sig)
 int main(int argc, char *argv[])
 {
     int fd0;
+    (void)argc;
+    (void)argv;
+    
+    getcwd(cwd, sizeof(cwd));
+    sprintf(path, "%s/mole", cwd);
+    printf("%s\n", cwd);
     pid_t pid = fork();
     if(pid < 0)
     {

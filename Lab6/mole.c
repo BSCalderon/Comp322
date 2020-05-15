@@ -1,11 +1,20 @@
 #include<stdlib.h>
 #include<stdio.h>
 #include<string.h>
+#include<limits.h>
 int main(int argc, char *argv[])
 {
+    (void)argc;
+    
     FILE *file;
-    file = fopen("/home/stephen/lab6.log", "a");
-    printf("\n entered mole");
+    char *filename = "/lab6.log";
+    char *f;
+    f = malloc(strlen(getenv("HOME") + strlen(filename) + 1));
+    strcpy(f,getenv("HOME"));
+    strcat(f, filename);
+    //strcat(strcpy(f, getenv("HOME")), "/lab6.log");
+    file = fopen(f, "a");
+    
     if(!file)
     {
         perror("Error\n");
