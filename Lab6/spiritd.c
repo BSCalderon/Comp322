@@ -12,7 +12,7 @@
 #include<limits.h>
 
 
-static pid_t pidMoleChild;
+static pid_t mole1pid, mole2pid;
 static int num;
 char cwd[PATH_MAX];
 char path[300];
@@ -32,43 +32,47 @@ static void handler(int sig)
     signal(sig, handler);
     if(sig == SIGTERM)
     {
-        kill(pidMoleChild, SIGKILL);
+        kill(mole1pid, SIGKILL);
+        kill(mole2pid, SIGKILL);
+        //kill(pid, SIGKILL);
         exit(0);
     }
     else if (sig == SIGUSR1)
     {
         
-        if(num == 0)
+        if(mole1pid != 0)
         {
-            kill(pidMoleChild, SIGCHLD);
+            kill(mole1pid, SIGKILL);
         }
         num = randomNum();
         char nums[20];
         sprintf(nums, "%d", num);
         
         char *argv2[] = {path, nums, NULL};
-        pidMoleChild = fork();
-        if(pidMoleChild == 0)
+        mole1pid = fork();
+        if(mole1pid == 0)
         {
             execv(argv2[0], argv2);
         }
+        
         signal(SIGUSR1, handler);
     }
     else if(sig == SIGUSR2)
     {
-        if(num == 1)
+        if(mole2pid != 0)
         {
-            kill(pidMoleChild, SIGCHLD);
+            kill(mole2pid, SIGKILL);
         }
         num = randomNum();
         char nums[20];
         sprintf(nums, "%d", num);
         char *argv2[] = {path, nums, NULL};
-        pidMoleChild = fork();
-        if(pidMoleChild == 0)
+        mole2pid = fork();
+        if(mole2pid == 0)
         {
             execv(argv2[0], argv2);
         }
+
         signal(SIGUSR2, handler);
     }
 }
@@ -80,7 +84,7 @@ int main(int argc, char *argv[])
     
     getcwd(cwd, sizeof(cwd));
     sprintf(path, "%s/mole", cwd);
-    printf("%s\n", cwd);
+    //printf("%s\n", cwd);
     pid_t pid = fork();
     if(pid < 0)
     {
@@ -119,7 +123,7 @@ int main(int argc, char *argv[])
     signal(SIGUSR1, handler);
     signal(SIGUSR2, handler);
 
-    pidMoleChild = fork();
+    //pidMoleChild = fork();
 
     while(1)
     {
